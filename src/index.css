@@ -1,3 +1,19 @@
+/* Reseta margens e preenchimentos de TUDO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Garante que o corpo da página ocupe 100% da tela sem barras de rolagem */
+html,
+body,
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000000; /* Fundo preto por precaução */
+}
 /* :root {
   --text: #6b6375;
   --text-h: #08060d;

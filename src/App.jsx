@@ -4,6 +4,10 @@ import {
   CSS2DRenderer,
   CSS2DObject,
 } from "https://esm.sh/three/examples/jsm/renderers/CSS2DRenderer.js";
+import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import ForceGraph2D from "react-force-graph-2d";
 import TelaAcesso from "./TelaAcesso";
 const extraRenderers = [new CSS2DRenderer()];
@@ -407,6 +411,7 @@ function App() {
   // --- NOVOS ESTADOS ---
   const [isMenuOpen, setIsMenuOpen] = useState(true);
   const [filtroTexto, setFiltroTexto] = useState("");
+  const [isProfileOpen, setProfileOpen] = useState(false);
   const [noSelecionado, setNoSelecionado] = useState(null);
   const [is3D, setIs3D] = useState(true); // <- Memória para saber se estamos no 3D ou 2D
   const [telaAtual, setTelaAtual] = useState("mapa");
@@ -748,33 +753,58 @@ function App() {
     >
       {/* --- RENDERIZADOR CONDICIONAL: 3D OU 2D --- */}
       {telaAtual === "mapa" && is3D ? (
-        <ForceGraph3D
-          ref={fgRef}
-          graphData={dadosParaRenderizar}
-          nodeAutoColorBy="group"
-          nodeColor="color"
-          nodeRelSize={1.5}
-          linkColor={() => "rgba(255, 255, 255, 1)"}
-          linkWidth={3}
-          nodeLabel="name"
-          onNodeClick={handleNodeClick}
-          linkDirectionalParticles={1}
-          extraRenderers={extraRenderers}
-        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            overflow: "hidden",
+            backgroundColor: "#000",
+          }}
+        >
+          <ForceGraph3D
+            ref={fgRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            graphData={dadosParaRenderizar}
+            nodeAutoColorBy="group"
+            nodeColor="color"
+            nodeRelSize={1.5}
+            linkColor={() => "rgba(255, 255, 255, 1)"}
+            linkWidth={3}
+            nodeLabel="name"
+            onNodeClick={handleNodeClick}
+            linkDirectionalParticles={1}
+            extraRenderers={extraRenderers}
+          />
+        </div>
       ) : (
-        <ForceGraph2D
-          ref={fgRef}
-          graphData={dadosParaRenderizar}
-          nodeAutoColorBy="group"
-          nodeColor="color"
-          nodeRelSize={4} // No 2D os nós precisam ser um pouco maiores
-          linkColor={() => "rgba(255,255,255,1)"}
-          linkWidth={2}
-          nodeLabel="name"
-          onNodeClick={handleNodeClick}
-        />
+        <div
+          style={{
+            position: "relative",
+            height: "100vh",
+            width: "100vw",
+            backgroundColor: "#050505",
+            fontFamily: "sans-serif",
+          }}
+        >
+          <ForceGraph2D
+            ref={fgRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            graphData={dadosParaRenderizar}
+            nodeAutoColorBy="group"
+            nodeColor="color"
+            nodeRelSize={4} // No 2D os nós precisam ser um pouco maiores
+            linkColor={() => "rgba(255,255,255,1)"}
+            linkWidth={2}
+            nodeLabel="name"
+            onNodeClick={handleNodeClick}
+          />
+        </div>
       )}
-
       {/* --- MENU LATERAL --- */}
       <div
         style={{
@@ -918,7 +948,6 @@ function App() {
           Sair / Fazer Logout
         </button>
       </div>
-
       {/* --- BOTÃO DE HAMBÚRGUER --- */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -940,29 +969,30 @@ function App() {
       >
         ☰
       </button>
-
       {/* --- BOTÃO DE ALTERNÂNCIA 2D / 3D --- */}
-      <button
-        onClick={() => setIs3D(!is3D)}
-        style={{
-          position: "absolute",
-          top: "20px",
-          right: "20px",
-          zIndex: 30,
-          backgroundColor: is3D ? "#2ecc71" : "#3498db", // Verde pro 3D, Azul pro 2D
-          border: "none",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          fontSize: "14px",
-          fontWeight: "bold",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
-          transition: "background-color 0.3s",
-        }}
-      >
-        {is3D ? "👀 Mudar para 2D" : "🌌 Mudar para 3D"}
-      </button>
+      {telaAtual === "mapa" && (
+        <button
+          onClick={() => setIs3D(!is3D)}
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            zIndex: 30,
+            backgroundColor: is3D ? "#2ecc71" : "#3498db", // Verde pro 3D, Azul pro 2D
+            border: "none",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: "bold",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
+            transition: "background-color 0.3s",
+          }}
+        >
+          {is3D ? "👀 Mudar para 2D" : "🌌 Mudar para 3D"}
+        </button>
+      )}
       {telaAtual === "perfil" && <TelaPerfilUsuario />}
     </div>
   );
